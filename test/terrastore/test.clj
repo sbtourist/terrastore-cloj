@@ -119,7 +119,7 @@
   (try
     (def test-bucket (terrastore-server :bucket "test-complete"))
     (def test-key (test-bucket :key "1"))
-    (test-key :put :value "{\"key1\" : \"value1\"}")
+    (test-key :put "{\"key1\" : \"value1\"}")
     (is (= "{\"key1\" : \"value1\"}" (test-key :get)))
     (is (= "{\"1\":{\"key1\" : \"value1\"}}" (test-bucket :list)))
     (finally

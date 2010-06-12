@@ -145,20 +145,20 @@
 
 (defn key-operations [base bucket k]
   (fn [operation & args]
-    ((fn-match ignored
-       ([:put] ((def operation-args (apply hash-map args)) (put-value base bucket k (operation-args :value))))
+    ((fn-match key-operations-match
+       ([:put] (put-value base bucket k (first args)))
        ([:get] (get-value base bucket k))
        ([:remove] (remove-value base bucket k))
-       ([:conditionally-put] ((def operation-args (apply hash-map args)) (put-value base bucket k (operation-args :value) (operation-args :params))))
+       ([:conditionally-put] ((def operation-args (apply hash-map (rest args))) (put-value base bucket k (first args) (operation-args :params))))
        ([:conditionally-get] ((def operation-args (apply hash-map args)) (get-value base bucket k (operation-args :params))))
-       ([:update] ((def operation-args (apply hash-map args)) (do-update base bucket k (operation-args :value) (operation-args :params))))
+       ([:update] ((def operation-args (apply hash-map args)) (do-update base bucket k (operation-args :arguments) (operation-args :params))))
        ) operation)
     )
   )
 
 (defn bucket-operations [base bucket]
   (fn [operation & args]
-    ((fn-match ignored
+    ((fn-match bucket-operations-match
        ([:list] (values base bucket))
        ([:remove] (remove-bucket base bucket))
        ([:import] ((def operation-args (apply hash-map args)) (do-import base bucket (operation-args :params))))
@@ -172,7 +172,7 @@
 
 (defn terrastore [base]
   (fn [operation & args]
-    ((fn-match ignored
+    ((fn-match base-match
       ([:list] (buckets base))
       ([:bucket] (bucket-operations base (first args)))
       ) operation)
