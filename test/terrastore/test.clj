@@ -1,4 +1,4 @@
-(ns terrastore.test (:use clojure.test terrastore.terrastore-cloj))
+(ns terrastore.test (:use clojure.test terrastore.terrastore-cloj terrastore.terrastore-ops))
 
 (deftest test-connection-error
   (is (thrown? java.net.ConnectException (buckets "http://acme.org:8080")))
