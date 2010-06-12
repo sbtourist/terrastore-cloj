@@ -1,4 +1,4 @@
-(ns terrastore.terrastore-cloj (:use clojure.contrib.json.read clojure-http.client))
+(ns terrastore.terrastore-cloj (:use clojure.contrib.json.read clojure-http.client matchure))
 
 (defn- strip-slash [base]
   (loop [url base]
@@ -143,28 +143,38 @@
     )
   )
 
-(defn bucket [base bucket]
-  {:list (fn [] (values base bucket))
-   :put (fn [k v] (put-value base bucket k v))
-   :get (fn [k] (get-value base bucket k))
-   :remove (fn [k] (remove-value base bucket k))
-   :conditionally-put (fn [k v params] (put-value base bucket k v params))
-   :conditionally-get (fn [k params] (get-value base bucket k params))
-   :import (fn [params] (do-import base bucket params))
-   :export (fn [params] (do-export base bucket params))
-   :update (fn [k update params] (do-update base bucket k update params))
-   :predicate (fn [params] (do-predicate-query base bucket params))
-   :range (fn [params] (do-range-query base bucket params))
-   }
+(defn key-operations [base bucket k]
+  (fn [operation & args]
+    ((fn-match ignored
+       ([:put] ((def operation-args (apply hash-map args)) (put-value base bucket k (operation-args :value))))
+       ([:get] (get-value base bucket k))
+       ([:remove] (remove-value base bucket k))
+       ([:conditionally-put] ((def operation-args (apply hash-map args)) (put-value base bucket k (operation-args :value) (operation-args :params))))
+       ([:conditionally-get] ((def operation-args (apply hash-map args)) (get-value base bucket k (operation-args :params))))
+       ([:update] ((def operation-args (apply hash-map args)) (do-update base bucket k (operation-args :value) (operation-args :params))))
+       ) operation)
+    )
+  )
+
+(defn bucket-operations [base bucket]
+  (fn [operation & args]
+    ((fn-match ignored
+       ([:list] (values base bucket))
+       ([:remove] (remove-bucket base bucket))
+       ([:import] ((def operation-args (apply hash-map args)) (do-import base bucket (operation-args :params))))
+       ([:export] ((def operation-args (apply hash-map args)) (do-export base bucket (operation-args :params))))
+       ([:query-by-predicate] ((def operation-args (apply hash-map args)) (do-predicate-query base bucket (operation-args :params))))
+       ([:query-by-range] ((def operation-args (apply hash-map args)) (do-range-query base bucket (operation-args :params))))
+       ([:key] (key-operations base bucket (first args)))
+       ) operation)
+    )
   )
 
 (defn terrastore [base]
-  (def ops {:list (fn [] (buckets base))
-   :bucket (fn [bucket-name] (bucket base bucket-name))
-   :remove (fn [bucket-name] (remove-bucket base bucket-name))
-   })
-   (fn
-     ([op] (ops op))
-     ([op b] ((ops op) b))
-   )
+  (fn [operation & args]
+    ((fn-match ignored
+      ([:list] (buckets base))
+      ([:bucket] (bucket-operations base (first args)))
+      ) operation)
+    )
   )

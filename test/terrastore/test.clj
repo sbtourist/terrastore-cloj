@@ -118,11 +118,12 @@
   (def terrastore-server (terrastore "http://127.0.0.1:8080"))
   (try
     (def test-bucket (terrastore-server :bucket "test-complete"))
-    ((test-bucket :put) "1" "{\"key1\" : \"value1\"}")
-    (is (= "{\"key1\" : \"value1\"}" ((test-bucket :get) "1")))
-    (is (= "{\"1\":{\"key1\" : \"value1\"}}" ((test-bucket :list))))
+    (def test-key (test-bucket :key "1"))
+    (test-key :put :value "{\"key1\" : \"value1\"}")
+    (is (= "{\"key1\" : \"value1\"}" (test-key :get)))
+    (is (= "{\"1\":{\"key1\" : \"value1\"}}" (test-bucket :list)))
     (finally
-      ((terrastore-server :remove) "test-complete")
+      ((terrastore-server :bucket "test-complete") :remove)
       )
     )
   )
