@@ -11,7 +11,7 @@
 
 (defn- terrastore-error [base error]
   (if (seq error)
-    (
+    (do
       (def error-map (read-json error))
       ((throw (RuntimeException. (str "Message: " (error-map "message") " - Code: " (error-map "code")))))
       )

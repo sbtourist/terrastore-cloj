@@ -1,7 +1,20 @@
 (ns terrastore.test (:use clojure.test terrastore.terrastore-cloj terrastore.terrastore-ops))
 
-(deftest test-connection-error
+(deftest test-connection-exception
   (is (thrown? java.net.ConnectException (buckets "http://acme.org:8080")))
+  )
+
+(deftest test-terrastore-exception
+  (try
+    (get-value "http://127.0.0.1:8080" "test-terrastore-exception" "1")
+    (is (false? true))
+    (catch RuntimeException ex
+      (is (not (nil? (.getMessage ex))))
+      )
+    (finally
+      (remove-bucket "http://127.0.0.1:8080" "test-terrastore-exception")
+      )
+    )
   )
 
 (deftest test-buckets
