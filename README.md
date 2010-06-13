@@ -3,8 +3,8 @@
 Terrastore Clojure Client provides easy to use APIs for accessing the [Terrastore](http://code.google.com/p/terrastore/) NOSQL store.
 You can use it in two different ways:
 
-    * Chainable.
-    * Bookmarkable.
+* Chainable.
+* Bookmarkable.
 
 **Chainable** APIs can be used to interact with a Terrastore Server by chaining function calls as follows:
 
