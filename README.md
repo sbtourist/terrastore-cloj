@@ -73,9 +73,9 @@ Syntax:
 
 Now let's bookmark a key:
 
-    (my-bucket :key "1")
+    (def my-key (my-bucket :key "1"))
 
-And go on by showing document management operations.
+And go on by showing document management operations over _my-key_.
 
 ### Put Document.
 
