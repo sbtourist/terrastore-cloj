@@ -118,3 +118,7 @@ Syntax:
 
 You can find more detailed examples in the [test suite](http://github.com/sbtourist/terrastore-cloj/blob/master/test/terrastore/test.clj).
 Moreover, take a look at the [Terrastore HTTP APIs guide](http://code.google.com/p/terrastore/wiki/HTTP_Client_API) for a more detailed description of all operations and their parameters. 
+
+## Download
+
+You can download the latest jar distribution from [GitHub](http://github.com/sbtourist/terrastore-cloj/downloads) or [Clojars](http://clojars.org/terrastore-cloj).
