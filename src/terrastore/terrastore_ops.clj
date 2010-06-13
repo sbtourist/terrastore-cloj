@@ -31,13 +31,18 @@
     )
   )
 
-(defn values [base bucket]
-  (let [url (str (strip-slash base) "/" bucket)
-        response (request url "GET" {"Content-Type" "application/json"})]
-    (cond
-      (= (response :code) 200) (extract-body response)
-      :else (terrastore-error base (extract-body response))
+(defn values
+  ([base bucket params]
+    (let [url (str (strip-slash base) "/" bucket)
+          response (request url "GET" {"Content-Type" "application/json"} {} params)]
+      (cond
+        (= (response :code) 200) (extract-body response)
+        :else (terrastore-error base (extract-body response))
+        )
       )
+    )
+  ([base bucket]
+    (values base bucket [])
     )
   )
 

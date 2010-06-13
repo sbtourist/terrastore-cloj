@@ -33,6 +33,8 @@
     (put-value "http://127.0.0.1:8080" "test-values" "1" "{\"key1\" : \"value1\"}")
     (def value (values "http://127.0.0.1:8080" "test-values"))
     (is (= "{\"1\":{\"key1\" : \"value1\"}}" value))
+    (def value (values "http://127.0.0.1:8080" "test-values" {"limit" "1"}))
+    (is (= "{\"1\":{\"key1\" : \"value1\"}}" value))
     (finally
       (remove-bucket "http://127.0.0.1:8080" "test-values")
       )
@@ -142,6 +144,7 @@
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :query-by-range :params {"startKey" "1" "endKey" "1" "limit" "1"})))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :query-by-predicate :params {"predicate" "jxpath:/key1[.='value1']"})))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list)))
+    (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list :params {"limit" "1"})))
     (finally
       ((terrastore-server :bucket "test-complete") :remove)
       )

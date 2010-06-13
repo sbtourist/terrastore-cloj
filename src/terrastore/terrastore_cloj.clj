@@ -16,7 +16,7 @@
 (defn bucket-operations [base bucket]
   (fn [operation & args]
     ((fn-match bucket-operations-match
-       ([:list] (values base bucket))
+       ([:list] (do (def operation-args (apply hash-map args)) (values base bucket (if (nil? (seq operation-args)) {} (operation-args :params)))))
        ([:remove] (remove-bucket base bucket))
        ([:import] (do (def operation-args (apply hash-map args)) (do-import base bucket (operation-args :params))))
        ([:export] (do (def operation-args (apply hash-map args)) (do-export base bucket (operation-args :params))))

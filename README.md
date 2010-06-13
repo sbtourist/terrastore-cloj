@@ -55,6 +55,7 @@ Syntax:
 
 Syntax:
 
+    (my-bucket :list)
     (my-bucket :list :params {"limit" "..."})
 
 ### Predicate Queries
