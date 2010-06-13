@@ -1,4 +1,4 @@
-(ns terrastore.terrastore-cloj (:use clojure.contrib.json.read clojure-http.client matchure terrastore.terrastore-ops))
+(ns terrastore.terrastore-cloj (:use matchure terrastore.terrastore-ops))
 
 (defn key-operations [base bucket k]
   (fn [operation & args]
