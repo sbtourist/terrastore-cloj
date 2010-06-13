@@ -33,6 +33,12 @@ We will use _bookmarkable_ APIs to maintain our samples as concise as possible, 
 
 Now let's see bucket management operations over our _my-bucket_ bucket.
 
+### List All Buckets.
+
+Syntax:
+
+    (my-server :buckets)
+
 ### Remove Bucket.
 
 Syntax:

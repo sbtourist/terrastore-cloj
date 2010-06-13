@@ -30,7 +30,7 @@
 (defn terrastore [base]
   (fn [operation & args]
     ((fn-match base-match
-      ([:list] (buckets base))
+      ([:buckets] (buckets base))
       ([:bucket] (bucket-operations base (first args)))
       ) operation)
     )

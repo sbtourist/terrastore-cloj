@@ -145,6 +145,7 @@
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :query-by-predicate :params {"predicate" "jxpath:/key1[.='value1']"})))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list)))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list :params {"limit" "1"})))
+    (is (= "[\"test-complete\"]" (terrastore-server :buckets)))
     (finally
       ((terrastore-server :bucket "test-complete") :remove)
       )
