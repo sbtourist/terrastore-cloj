@@ -9,6 +9,10 @@
     )
   )
 
+(defn- extract-body [response]
+  (apply str (response :body-seq))
+  )
+
 (defn- terrastore-error [base error]
   (if (seq error)
     (do
@@ -21,8 +25,8 @@
 (defn buckets [base]
   (let [response (request (strip-slash base) "GET")]
     (cond
-      (= (:code response) 200) (apply str (:body-seq response))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -31,8 +35,8 @@
   (let [url (str (strip-slash base) "/" bucket)
         response (request url "GET" {"Content-Type" "application/json"})]
     (cond
-      (= (response :code) 200) (apply str (response :body-seq))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -41,7 +45,7 @@
   (let [url (str (strip-slash base) "/" bucket)
     response (request url "DELETE")]
     (cond
-      (not (= (:code response) 204)) (terrastore-error base (apply str (:body-seq response)))
+      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
@@ -50,8 +54,8 @@
   (let [url (str (strip-slash base) "/" bucket "/" k)
     response (request url "PUT" {"Content-Type" "application/json"} {} {} v)]
     (cond
-      (= (:code response) 204) (apply str (:body-seq response))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 204) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -60,8 +64,8 @@
   (let [url (str (strip-slash base) "/" bucket "/" k)
     response (request url "PUT" {"Content-Type" "application/json"} {} params v)]
     (cond
-      (= (:code response) 204) (apply str (:body-seq response))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 204) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -70,8 +74,8 @@
   (let [url (str (strip-slash base) "/" bucket "/" k)
     response (request url "GET" {"Content-Type" "application/json"})]
     (cond
-      (= (response :code) 200) (apply str (response :body-seq))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -80,8 +84,8 @@
   (let [url (str (strip-slash base) "/" bucket "/" k)
     response (request url "GET" {"Content-Type" "application/json"} {} params)]
     (cond
-      (= (response :code) 200) (apply str (response :body-seq))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -90,7 +94,7 @@
   (let [url (str (strip-slash base) "/" bucket "/" k)
     response (request url "DELETE")]
     (cond
-      (not (= (:code response) 204)) (terrastore-error base (apply str (:body-seq response)))
+      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
@@ -99,7 +103,7 @@
   (let [url (str (strip-slash base) "/" bucket "/export")
     response (request url "POST" {} {} params)]
     (cond
-      (not (= (:code response) 204)) (terrastore-error base (apply str (:body-seq response)))
+      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
@@ -108,7 +112,7 @@
   (let [url (str (strip-slash base) "/" bucket "/import")
     response (request url "POST" {} {} params)]
     (cond
-      (not (= (response :code) 204)) (terrastore-error base (apply str (:body-seq response)))
+      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
@@ -117,8 +121,8 @@
   (let [url (str (strip-slash base) "/" bucket "/" k "/update")
     response (request url "POST" {"Content-Type" "application/json"} {} params update)]
     (cond
-      (= (response :code) 200) (apply str (response :body-seq))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -127,8 +131,8 @@
   (let [url (str (strip-slash base) "/" bucket "/predicate")
     response (request url "GET" {"Content-Type" "application/json"} {} params)]
     (cond
-      (= (response :code) 200) (apply str (response :body-seq))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
@@ -137,8 +141,8 @@
   (let [url (str (strip-slash base) "/" bucket "/range")
     response (request url "GET" {"Content-Type" "application/json"} {} params)]
     (cond
-      (= (response :code) 200) (apply str (response :body-seq))
-      :else (terrastore-error base (apply str (:body-seq response)))
+      (= (response :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )
