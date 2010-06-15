@@ -1,4 +1,4 @@
-# Terrastore Clojure Client API
+# Terrastore Clojure Client API - Version 0.1.0
 
 Terrastore Clojure Client provides easy to use APIs for accessing the [Terrastore](http://code.google.com/p/terrastore/) NOSQL store.
 You can use it in two different ways:
