@@ -1,6 +1,6 @@
 (ns terrastore.terrastore-cloj (:use matchure terrastore.terrastore-ops))
 
-(defn key-operations [base bucket k]
+(defn- key-operations [base bucket k]
   (fn [operation & args]
     ((fn-match key-operations-match
        ([:put] (put-value base bucket k (first args)))
@@ -13,7 +13,7 @@
     )
   )
 
-(defn bucket-operations [base bucket]
+(defn- bucket-operations [base bucket]
   (fn [operation & args]
     ((fn-match bucket-operations-match
        ([:list] (do (def operation-args (apply hash-map args)) (values base bucket (if (nil? (seq operation-args)) {} (operation-args :params)))))
@@ -34,4 +34,24 @@
       ([:bucket] (bucket-operations base (first args)))
       ) operation)
     )
+  )
+
+(defmacro with-terrastore [base & forms]
+  (cond (seq? (first forms))
+    `(let [~'terrastore_cloj-server (terrastore ~base)] (do ~@forms))
+    :else
+    `(let [args# (list ~@forms)] (apply (terrastore ~base) args#))
+    )
+  )
+
+(defmacro with-bucket [bucket & forms]
+  (cond (seq? (first forms))
+    `(let [~'terrastore_cloj-bucket (~'terrastore_cloj-server :bucket ~bucket)] (do ~@forms))
+    :else
+    `(let [args# (list ~@forms)] (apply (~'terrastore_cloj-server :bucket ~bucket) args#))
+    )
+  )
+
+(defmacro with-key [k & forms]
+  `(let [args# (list ~@forms)] (apply (~'terrastore_cloj-bucket :key ~k) args#))
   )
