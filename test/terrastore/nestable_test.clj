@@ -19,13 +19,6 @@
       )
 
     (with-terrastore "http://127.0.0.1:8080"
-      (with-bucket "test-macros"
-        (with-key "1" :update :arguments "{\"key1\":\"value1\"}" :params {"function" "replace" "timeout" "3000"}
-          )
-        )
-      )
-
-    (with-terrastore "http://127.0.0.1:8080"
       (with-bucket "test-macros" :export :params {"destination" "export.json" "secret" "SECRET-KEY"}
         )
       )
@@ -35,6 +28,15 @@
         )
       )
 
+    (is (= "{\"key1\":\"value1\"}"
+          (with-terrastore "http://127.0.0.1:8080"
+            (with-bucket "test-macros"
+              (with-key "1" :update :arguments "{\"key1\":\"value1\"}" :params {"function" "replace" "timeout" "3000"}
+                )
+              )
+            )
+          )
+      )
 
     (is (= "{\"key1\":\"value1\"}"
           (with-terrastore "http://127.0.0.1:8080"

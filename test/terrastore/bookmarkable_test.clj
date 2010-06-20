@@ -9,10 +9,11 @@
 
     (test-key :put "{\"key1\":\"value1\"}")
     (test-key :conditionally-put "{\"key1\":\"value1\"}" :params {"predicate" "jxpath:/key1[.='value1']"})
-    (test-key :update :arguments "{\"key1\":\"value1\"}" :params {"function" "replace" "timeout" "3000"})
 
     (test-bucket :export :params {"destination" "export.json" "secret" "SECRET-KEY"})
     (test-bucket :import :params {"source" "export.json" "secret" "SECRET-KEY"})
+
+    (is (= "{\"key1\":\"value1\"}" (test-key :update :arguments "{\"key1\":\"value1\"}" :params {"function" "replace" "timeout" "3000"})))
     
     (is (= "{\"key1\":\"value1\"}" (test-key :get)))
     (is (= "{\"key1\":\"value1\"}" (test-key :conditionally-get :params {"predicate" "jxpath:/key1[.='value1']"})))
