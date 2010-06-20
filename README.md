@@ -1,18 +1,12 @@
-# Terrastore Clojure Client API - Version 0.1.0
+# Terrastore Clojure Client API - Version 0.2.0
 
 Terrastore Clojure Client provides easy to use APIs for accessing the [Terrastore](http://code.google.com/p/terrastore/) NOSQL store.
 You can use it in two different ways:
 
-* Chainable.
 * Bookmarkable.
+* Nestable.
 
-**Chainable** APIs can be used to interact with a Terrastore Server by chaining function calls as follows:
-
-    ((((terrastore "http://127.0.0.1:8080") :bucket "bucket") :key "1") :get)
-
-The most relevant part of the piece of code above is the _(((terrastore "http://127.0.0.1:8080") :bucket "bucket") :key "1")_ call which will access the Terrastore Server at _http://127.0.0.1:8080_, and the provided bucket (_bucket_) and key (_1_).
-
-**Bookmarkable** APIs can be used to store a reference to a Terrastore Server connection, a bucket and a key, by simply "breaking" the chain above as follows:
+**Bookmarkable** APIs can be used to store a reference to a Terrastore Server connection, a bucket and a key, for later reuse:
 
     (def my-server (terrastore "http://127.0.0.1:8080"))
     (def my-bucket (my-server :bucket "bucket"))
@@ -22,102 +16,209 @@ Once stored your references, you can pass them around to make your code more con
 
     (my-key :get)
 
-Now, let's take a look at all supported operations.
+**Nestable** APIs can be used to interact with a Terrastore Server in a DSL-style approach, by nesting function calls as follows:
+
+    (with-terrastore "http://127.0.0.1:8080"
+      (with-bucket "bucket"
+        (with-key "1" :put "{\"key\":\"value\"}"
+          )
+        )
+      )
+
+As you may see, you just specify the Terrastore server, bucket and key you want to interact with, and the final operation, with related arguments, you want to execute.
+
+Now, let's take a look at all supported operations in both flavors.
 
 ## Bucket Management
 
-We will use _bookmarkable_ APIs to maintain our samples as concise as possible, so let's bookmark our server and bucket:
+To maintain our samples about bookmarkable APIs as concise as possible, we'll bookmark our server and bucket as follows:
 
     (def my-server (terrastore "http://127.0.0.1:8080"))
     (def my-bucket (my-server :bucket "bucket"))
 
-Now let's see bucket management operations over our _my-bucket_ bucket.
+Now let's take a look at bucket management operations.
 
 ### List All Buckets.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-server :buckets)
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080" :buckets)
+
 ### Remove Bucket.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-bucket :remove)
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+      (with-bucket "bucket" :remove
+        )
+      )
+
 ### Export Bucket.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-bucket :export :params {"destination" "..." "secret" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+      (with-bucket "bucket" :export :params {"destination" "..." "secret" "..."}
+        )
+      )
+
 ### Import Bucket.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-bucket :import :params {"source" "..." "secret" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+      (with-bucket "bucket" :import :params {"source" "..." "secret" "..."}
+        )
+      )
+
 ### List Values.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-bucket :list)
     (my-bucket :list :params {"limit" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket" :list
+          )
+        )
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket" :list :params {"limit" "1"}
+          )
+        )
+
 ### Predicate Queries
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-bucket :query-by-predicate :params {"predicate" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket" :query-by-predicate :params {"predicate" "..."}
+          )
+        )
+
 ### Range Queries
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-bucket :query-by-range :params {"comparator" "..." "startKey" "..." "endKey" "..." "limit" "..." "predicate" "..." "timeToLive" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket" :query-by-range :params {"comparator" "..." "startKey" "..." "endKey" "..." "limit" "..." "predicate" "..." "timeToLive" "..."}
+          )
+        )
+
 ## Document Management
 
-Now let's bookmark a key:
+Now let's bookmark a key to use in our samples:
 
     (def my-key (my-bucket :key "1"))
 
-And go on by showing document management operations over _my-key_.
+And go on by showing document management operations in both bookmarkable and nestable flavors.
 
 ### Put Document.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-key :put "string containing a json document")
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket"
+          (with-key "1" :put "string containing a json document"
+            )
+          )
+        )
+
 ### Get Document.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-key :get)
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket"
+          (with-key "1" :get
+            )
+          )
+        )
+
 ### Conditionally Put Document.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-key :conditionally-put "string containing a json document" :params {"predicate" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket"
+          (with-key "1" :conditionally-put "string containing a json document" :params {"predicate" "..."})
+            )
+          )
+        )
+
 ### Conditionally Get Document.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-key :conditionally-get :params {"predicate" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket"
+          (with-key "1" :conditionally-get :params {"predicate" "..."}
+            )
+          )
+        )
+
 ### Server-side Document Update.
 
-Syntax:
+Bookmarkable Syntax:
 
     (my-key :update :arguments "string containing a json document representing update data" :params {"function" "..." "timeout" "..."})
 
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket"
+          (with-key "1" :update :arguments "string containing a json document representing update data" :params {"function" "..." "timeout" "..."}
+            )
+          )
+        )
+
 ## Where to find more.
 
-You can find more detailed examples in the [test suite](http://github.com/sbtourist/terrastore-cloj/blob/master/test/terrastore/test.clj).
-Moreover, take a look at the [Terrastore HTTP APIs guide](http://code.google.com/p/terrastore/wiki/HTTP_Client_API) for a more detailed description of all operations and their parameters. 
+You can find more detailed examples in the [test suite](http://github.com/sbtourist/terrastore-cloj/blob/master/test/terrastore/).
+Moreover, take a look at the [Terrastore HTTP APIs guide](http://code.google.com/p/terrastore/wiki/HTTP_Client_API) for a more detailed description of all operations and their parameters.
 
 ## Download
 
