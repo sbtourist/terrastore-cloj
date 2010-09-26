@@ -29,6 +29,18 @@ As you may see, you just specify the Terrastore server, bucket and key you want 
 
 Now, let's take a look at all supported operations in both flavors.
 
+## Statistics
+
+### Get Cluster Statistics.
+
+Bookmarkable Syntax:
+
+    ((terrastore "http://127.0.0.1:8080") :cluster-stats)
+
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080" :cluster-stats)
+
 ## Bucket Management
 
 To maintain our samples about bookmarkable APIs as concise as possible, we'll bookmark our server and bucket as follows:
@@ -37,16 +49,6 @@ To maintain our samples about bookmarkable APIs as concise as possible, we'll bo
     (def my-bucket (my-server :bucket "bucket"))
 
 Now let's take a look at bucket management operations.
-
-### Get Cluster Statistics.
-
-Bookmarkable Syntax:
-
-    (my-server :cluster-stats)
-
-Nestable Syntax:
-
-    (with-terrastore "http://127.0.0.1:8080" :cluster-stats)
 
 ### List All Buckets.
 
