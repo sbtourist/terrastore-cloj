@@ -1,4 +1,12 @@
-(ns terrastore.terrastore-ops (:use clojure.contrib.json clojure-http.client))
+(ns terrastore.terrastore-ops 
+  (:use 
+    [clojure.java.io :as io] 
+    [clojure.contrib.json :as json] 
+    [http.async.client :as http]
+    ) 
+  (:refer-clojure :exclude [await]
+    )
+  )
 
 (defn- strip-slash [base]
   (loop [url base]
@@ -9,22 +17,40 @@
     )
   )
 
+(defn- prepare-body [value]
+  (cond
+    (map? value) (io/input-stream (.getBytes (json/json-str value)))
+    (string? value) (io/input-stream (.getBytes value))
+    :else (throw (IllegalArgumentException. "Wrong value type!"))
+    )
+  )
+
+(defn- extract-status [response]
+  (if
+    (http/failed? response) (throw (http/error response))
+    (http/status response)
+    )
+  )
+
 (defn- extract-body [response]
-  (apply str (response :body-seq))
+  (if
+    (http/failed? response) (throw (http/error response))
+    (http/string response)
+    )
   )
 
 (defn- terrastore-error [base error]
   (if (seq error)
-    (let [error-map (read-json error)]
-      (throw (RuntimeException. (str "Message: " (error-map "message") " - Code: " (error-map "code"))))
+    (let [error-map (json/read-json error)]
+      (throw (RuntimeException. (str "Message: " (error-map :message) " - Code: " (error-map :code))))
       )
     )
   )
 
 (defn buckets [base]
-  (let [response (request (strip-slash base) "GET")]
+  (let [response (http/await (http/GET (strip-slash base)))]
     (cond
-      (= (response :code) 200) (extract-body response)
+      (= ((extract-status response) :code) 200) (extract-body response)
       :else (terrastore-error base (extract-body response))
       )
     )
@@ -33,9 +59,9 @@
 (defn values
   ([base bucket params]
     (let [url (str (strip-slash base) "/" bucket) 
-          response (request url "GET" {"Content-Type" "application/json"} {} params)]
+          response (http/await (http/GET url :headers {"Content-Type" "application/json"} :query params))]
       (cond
-        (= (response :code) 200) (extract-body response)
+        (= ((extract-status response) :code) 200) (extract-body response)
         :else (terrastore-error base (extract-body response))
         )
       )
@@ -44,42 +70,39 @@
     (values base bucket [])
     )
   )
-  
 
 (defn remove-bucket [base bucket]
   (let [url (str (strip-slash base) "/" bucket)
-        response (request url "DELETE")]
+        response (http/await (http/DELETE url))]
     (cond
-      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
+      (not (= ((extract-status response) :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
 
 (defn put-value [base bucket k v]
   (let [url (str (strip-slash base) "/" bucket "/" k)
-        response (request url "PUT" {"Content-Type" "application/json"} {} {} v)]
+        response (http/await (http/PUT url :headers {"Content-Type" "application/json"} :body (prepare-body v)))]
     (cond
-      (= (response :code) 204) (extract-body response)
-      :else (terrastore-error base (extract-body response))
+      (not (= ((extract-status response) :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
 
 (defn conditionally-put-value [base bucket k v params]
   (let [url (str (strip-slash base) "/" bucket "/" k)
-        response (request url "PUT" {"Content-Type" "application/json"} {} params v)]
+        response (http/await (http/PUT url :headers {"Content-Type" "application/json"} :query params :body (prepare-body v)))]
     (cond
-      (= (response :code) 204) (extract-body response)
-      :else (terrastore-error base (extract-body response))
+      (not (= ((extract-status response) :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
 
 (defn get-value [base bucket k]
   (let [url (str (strip-slash base) "/" bucket "/" k)
-        response (request url "GET" {"Content-Type" "application/json"})]
+        response (http/await (http/GET url :headers {"Content-Type" "application/json"}))]
     (cond
-      (= (response :code) 200) (extract-body response)
+      (= ((extract-status response) :code) 200) (extract-body response)
       :else (terrastore-error base (extract-body response))
       )
     )
@@ -87,9 +110,9 @@
 
 (defn conditionally-get-value [base bucket k params]
   (let [url (str (strip-slash base) "/" bucket "/" k)
-        response (request url "GET" {"Content-Type" "application/json"} {} params)]
+        response (http/await (http/GET url :headers {"Content-Type" "application/json"} :query params))]
     (cond
-      (= (response :code) 200) (extract-body response)
+      (= ((extract-status response) :code) 200) (extract-body response)
       :else (terrastore-error base (extract-body response))
       )
     )
@@ -97,36 +120,36 @@
 
 (defn remove-value [base bucket k]
   (let [url (str (strip-slash base) "/" bucket "/" k)
-        response (request url "DELETE")]
+        response (http/await (http/DELETE url))]
     (cond
-      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
+      (not (= ((extract-status response) :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
 
 (defn do-export [base bucket params]
   (let [url (str (strip-slash base) "/" bucket "/export")
-        response (request url "POST" {} {} params)]
+        response (http/await (http/POST url :query params))]
     (cond
-      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
+      (not (= ((extract-status response) :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
 
 (defn do-import [base bucket params]
   (let [url (str (strip-slash base) "/" bucket "/import")
-        response (request url "POST" {} {} params)]
+        response (http/await (http/POST url :query params))]
     (cond
-      (not (= (response :code) 204)) (terrastore-error base (extract-body response))
+      (not (= ((extract-status response) :code) 204)) (terrastore-error base (extract-body response))
       )
     )
   )
 
 (defn do-update [base bucket k update params]
   (let [url (str (strip-slash base) "/" bucket "/" k "/update")
-        response (request url "POST" {"Content-Type" "application/json"} {} params update)]
+        response (http/await (http/POST url :headers {"Content-Type" "application/json"} :query params :body (prepare-body update)))]
     (cond
-      (= (response :code) 200) (extract-body response)
+      (= ((extract-status response) :code) 200) (extract-body response)
       :else (terrastore-error base (extract-body response))
       )
     )
@@ -134,9 +157,9 @@
 
 (defn do-predicate-query [base bucket params]
   (let [url (str (strip-slash base) "/" bucket "/predicate")
-        response (request url "GET" {"Content-Type" "application/json"} {} params)]
+        response (http/await (http/GET url :headers {"Content-Type" "application/json"} :query params))]
     (cond
-      (= (response :code) 200) (extract-body response)
+      (= ((extract-status response) :code) 200) (extract-body response)
       :else (terrastore-error base (extract-body response))
       )
     )
@@ -144,9 +167,9 @@
 
 (defn do-range-query [base bucket params]
   (let [url (str (strip-slash base) "/" bucket "/range")
-        response (request url "GET" {"Content-Type" "application/json"} {} params)]
+        response (http/await (http/GET url :headers {"Content-Type" "application/json"} :query params))]
     (cond
-      (= (response :code) 200) (extract-body response)
+      (= ((extract-status response) :code) 200) (extract-body response)
       :else (terrastore-error base (extract-body response))
       )
     )
