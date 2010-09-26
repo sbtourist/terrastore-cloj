@@ -1,4 +1,4 @@
-# Terrastore Clojure Client API - Version 0.2.0
+# Terrastore Clojure Client API - Version 0.3.0
 
 Terrastore Clojure Client provides easy to use APIs for accessing the [Terrastore](http://code.google.com/p/terrastore/) NOSQL store.
 You can use it in two different ways:
@@ -37,6 +37,16 @@ To maintain our samples about bookmarkable APIs as concise as possible, we'll bo
     (def my-bucket (my-server :bucket "bucket"))
 
 Now let's take a look at bucket management operations.
+
+### Get Cluster Statistics.
+
+Bookmarkable Syntax:
+
+    (my-server :cluster-stats)
+
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080" :cluster-stats)
 
 ### List All Buckets.
 
@@ -155,6 +165,8 @@ Nestable Syntax:
           )
         )
 
+You can also represent and pass your document as a map object, rather than a string: it will be automatically converted.
+
 ### Get Document.
 
 Bookmarkable Syntax:
@@ -185,6 +197,8 @@ Nestable Syntax:
           )
         )
 
+You can also represent and pass your document as a map object, rather than a string: it will be automatically converted.
+
 ### Conditionally Get Document.
 
 Bookmarkable Syntax:
@@ -214,6 +228,8 @@ Nestable Syntax:
             )
           )
         )
+
+You can also represent and pass your update data as a map object, rather than a string: it will be automatically converted.
 
 ## Where to find more.
 
