@@ -1,4 +1,4 @@
-(ns terrastore.operations-test (:use clojure.test terrastore.terrastore-ops))
+(ns terrastore.operations-test (:use [clojure.test] [clojure.contrib.str-utils2 :only (contains?)] [terrastore.terrastore-ops]))
 
 (deftest test-connection-exception
   (is (thrown? java.net.ConnectException (buckets "http://acme.org:8080")))
@@ -15,6 +15,11 @@
       (remove-bucket "http://127.0.0.1:8080" "test-terrastore-exception")
       )
     )
+  )
+
+(deftest test-cluster-stats
+  (def value (cluster-stats "http://127.0.0.1:8080"))
+  (is (= true (contains? value "8080")))
   )
 
 (deftest test-buckets

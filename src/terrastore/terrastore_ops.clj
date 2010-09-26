@@ -3,7 +3,7 @@
     [clojure.java.io :as io] 
     [clojure.contrib.json :as json] 
     [http.async.client :as http]
-    ) 
+    )
   (:refer-clojure :exclude [await]
     )
   )
@@ -43,6 +43,15 @@
   (if (seq error)
     (let [error-map (json/read-json error)]
       (throw (RuntimeException. (str "Message: " (error-map :message) " - Code: " (error-map :code))))
+      )
+    )
+  )
+
+(defn cluster-stats [base]
+  (let [response (http/await (http/GET (str (strip-slash base) "/_stats/cluster")))]
+    (cond
+      (= ((extract-status response) :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
       )
     )
   )

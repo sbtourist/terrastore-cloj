@@ -1,4 +1,4 @@
-(ns terrastore.bookmarkable-test (:use clojure.test terrastore.terrastore-cloj))
+(ns terrastore.bookmarkable-test (:use [clojure.test] [clojure.contrib.str-utils2 :only (contains?)] [terrastore.terrastore-cloj]))
 
 (deftest test-complete
   (def terrastore-server (terrastore "http://127.0.0.1:8080"))
@@ -22,7 +22,9 @@
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list)))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list :params {"limit" "1"})))
     (is (= "[\"test-complete\"]" (terrastore-server :buckets)))
-
+    
+    (is (= true (contains? (terrastore-server :cluster-stats) "8080")))
+    
     (finally
       ((terrastore-server :bucket "test-complete") :remove)
       )
