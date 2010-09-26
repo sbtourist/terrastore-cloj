@@ -1,4 +1,4 @@
-(ns terrastore.macros-test (:use [clojure.test] [clojure.contrib.str-utils2 :only (contains?)] [terrastore.terrastore-cloj]))
+(ns terrastore.nestable-test (:use [clojure.test] [clojure.contrib.str-utils2 :only (contains?)] [terrastore.terrastore-cloj]))
 
 (deftest test-nestable
   (def terrastore-server (terrastore "http://127.0.0.1:8080"))
