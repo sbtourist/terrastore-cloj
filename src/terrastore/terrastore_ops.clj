@@ -19,8 +19,8 @@
 
 (defn- prepare-body [value]
   (cond
-    (map? value) (io/input-stream (.getBytes (json/json-str value)))
-    (string? value) (io/input-stream (.getBytes value))
+    (string? value) value
+    (map? value) (json/json-str value)
     :else (throw (IllegalArgumentException. "Wrong value type!"))
     )
   )
