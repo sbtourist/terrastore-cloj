@@ -1,4 +1,4 @@
-(ns terrastore.operations-test (:use [clojure.test] [clojure.contrib.str-utils2 :only (contains?)] [terrastore.terrastore-ops]))
+(ns terrastore.operations-test (:use [clojure.test] [clojure.contrib.str-utils2 :only (contains?)] [terrastore.terrastore-ops] [terrastore.terrastore-helpers]))
 
 (deftest test-connection-exception
   (is (thrown? java.net.ConnectException (buckets "http://acme.org:8080")))
@@ -62,6 +62,18 @@
     (is (= "{\"key\" : \"value\"}" value))
     (finally
       (remove-bucket "http://127.0.0.1:8080" "test-put-get-value")
+      )
+    )
+  )
+
+(deftest test-put-get-value-with-map
+  (try
+    (put-value "http://127.0.0.1:8080" "test-put-get-value-with-map" "1" {:key "value"})
+    (def value (get-value "http://127.0.0.1:8080" "test-put-get-value-with-map" "1"))
+    (is (= "{\"key\":\"value\"}" (as-string value)))
+    (is (= {:key "value"} (as-map value)))
+    (finally
+      (remove-bucket "http://127.0.0.1:8080" "test-put-get-value-with-map")
       )
     )
   )

@@ -7,3 +7,4 @@ classes
 build.xml
 argfile.xml
 pom.xml
+*.orig

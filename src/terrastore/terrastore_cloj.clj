@@ -1,8 +1,13 @@
-(ns terrastore.terrastore-cloj (:use matchure terrastore.terrastore-ops))
+(ns terrastore.terrastore-cloj
+ (:use
+   [matchure :as match]
+   [terrastore.terrastore-ops]
+   )
+ )
 
 (defn- key-operations [base bucket k]
   (fn [operation & args]
-    ((fn-match key-operations-match
+    ((match/fn-match key-operations-match
        ([:put] (put-value base bucket k (first args)))
        ([:get] (get-value base bucket k))
        ([:remove] (remove-value base bucket k))
@@ -15,7 +20,7 @@
 
 (defn- bucket-operations [base bucket]
   (fn [operation & args]
-    ((fn-match bucket-operations-match
+    ((match/fn-match bucket-operations-match
        ([:list] (let [operation-args (apply hash-map args)] (values base bucket (if (nil? (seq operation-args)) {} (operation-args :params)))))
        ([:remove] (remove-bucket base bucket))
        ([:import] (let [operation-args (apply hash-map args)] (do-import base bucket (operation-args :params))))
@@ -29,7 +34,7 @@
 
 (defn terrastore [base]
   (fn [operation & args]
-    ((fn-match base-match
+    ((match/fn-match base-match
       ([:cluster-stats] (cluster-stats base))
       ([:buckets] (buckets base))
       ([:bucket] (bucket-operations base (first args)))
