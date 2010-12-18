@@ -74,6 +74,14 @@
           )
       )
 
+    (is (= "{\"size\":1}"
+          (with-terrastore "http://127.0.0.1:8080"
+            (with-bucket "test-macros" :query-by-map-reduce :descriptor {:task {:mapper "size" :reducer "size" :timeout 10000}}
+              )
+            )
+          )
+      )
+
     (is (= "{\"1\":{\"key1\":\"value1\"}}"
           (with-terrastore "http://127.0.0.1:8080"
             (with-bucket "test-macros" :list

@@ -27,6 +27,7 @@
        ([:export] (let [operation-args (apply hash-map args)] (do-export base bucket (operation-args :params))))
        ([:query-by-predicate] (let [operation-args (apply hash-map args)] (do-predicate-query base bucket (operation-args :params))))
        ([:query-by-range] (let [operation-args (apply hash-map args)] (do-range-query base bucket (operation-args :params))))
+       ([:query-by-map-reduce] (let [operation-args (apply hash-map args)] (do-map-reduce base bucket (operation-args :descriptor))))
        ([:key] (key-operations base bucket (first args)))
        ) operation)
     )

@@ -145,3 +145,15 @@
       )
     )
   )
+
+(deftest test-do-map-reduce
+  (try
+    (put-value "http://127.0.0.1:8080" "test-do-map-reduce" "1" "{\"key1\" : \"value1\"}")
+    (put-value "http://127.0.0.1:8080" "test-do-map-reduce" "2" "{\"key2\" : \"value2\"}")
+    (def value (do-map-reduce "http://127.0.0.1:8080" "test-do-map-reduce" {:task {:mapper "size" :reducer "size" :timeout 10000}}))
+    (is (= "{\"size\":2}" value))
+    (finally
+      (remove-bucket "http://127.0.0.1:8080" "test-do-map-reduce")
+      )
+    )
+  )

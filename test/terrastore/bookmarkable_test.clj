@@ -19,6 +19,7 @@
     (is (= "{\"key1\":\"value1\"}" (test-key :conditionally-get :params {"predicate" "jxpath:/key1[.='value1']"})))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :query-by-range :params {"startKey" "1" "endKey" "1" "limit" "1"})))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :query-by-predicate :params {"predicate" "jxpath:/key1[.='value1']"})))
+    (is (= "{\"size\":1}" (test-bucket :query-by-map-reduce :descriptor {:task {:mapper "size" :reducer "size" :timeout 10000}})))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list)))
     (is (= "{\"1\":{\"key1\":\"value1\"}}" (test-bucket :list :params {"limit" "1"})))
     (is (= "[\"test-complete\"]" (terrastore-server :buckets)))

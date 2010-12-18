@@ -183,3 +183,13 @@
       )
     )
   )
+
+(defn do-map-reduce [base bucket mapreduce]
+  (let [url (str (strip-slash base) "/" bucket "/mapReduce")
+        response (http/await (http/POST url :headers {"Content-Type" "application/json"} :body (prepare-body mapreduce)))]
+    (cond
+      (= ((extract-status response) :code) 200) (extract-body response)
+      :else (terrastore-error base (extract-body response))
+      )
+    )
+  )
