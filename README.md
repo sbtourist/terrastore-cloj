@@ -1,4 +1,4 @@
-# Terrastore Clojure Client API - Version 0.3.0
+# Terrastore Clojure Client API - Version 0.4.0
 
 Terrastore Clojure Client provides easy to use APIs for accessing the [Terrastore](http://code.google.com/p/terrastore/) NOSQL store.
 You can use it in two different ways:
@@ -141,6 +141,19 @@ Nestable Syntax:
 
     (with-terrastore "http://127.0.0.1:8080"
         (with-bucket "bucket" :query-by-range :params {"comparator" "..." "startKey" "..." "endKey" "..." "limit" "..." "predicate" "..." "timeToLive" "..."}
+          )
+        )
+
+### Map-Reduce Queries
+
+Bookmarkable Syntax:
+
+    (my-bucket :query-by-map-reduce :descriptor {"task" {"..." "..."} "range" {"..." "..."})
+
+Nestable Syntax:
+
+    (with-terrastore "http://127.0.0.1:8080"
+        (with-bucket "bucket" :query-by-map-reduce :descriptor {"task" {"..." "..."} "range" {"..." "..."}
           )
         )
 
