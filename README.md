@@ -26,6 +26,7 @@ Once stored your references, you can pass them around to make your code more con
       )
 
 As you may see, you just specify the Terrastore server, bucket and key you want to interact with, and the final operation, with related arguments, you want to execute.
+Moreover, document values can be specified **both** as string and literal maps.
 
 Now, let's take a look at all supported operations in both flavors.
 
